@@ -1,0 +1,418 @@
+
+# =============================================================================
+# CRO AI Agent - Environment Variables Template
+# =============================================================================
+# Copy this file to .env and fill in your actual values
+# Never commit .env to version control!
+
+# =============================================================================
+# APPLICATION SETTINGS
+# =============================================================================
+APP_NAME="CRO AI Agent"
+APP_VERSION="1.0.0"
+ENVIRONMENT="development"  # development, staging, production
+DEBUG=true
+LOG_LEVEL="INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# Server Configuration
+HOST="0.0.0.0"
+PORT=8000
+WORKERS=1
+RELOAD=true
+
+# =============================================================================
+# SECURITY & AUTHENTICATION
+# =============================================================================
+# Generate with: openssl rand -hex 32
+SECRET_KEY="your-super-secret-key-here-change-this-in-production"
+JWT_SECRET_KEY="your-jwt-secret-key-here-change-this-in-production"
+JWT_ALGORITHM="HS256"
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Password hashing
+BCRYPT_ROUNDS=12
+
+# CORS Settings
+CORS_ORIGINS="http://localhost:3000,http://localhost:8000"
+CORS_ALLOW_CREDENTIALS=true
+
+# Rate Limiting
+RATE_LIMIT_PER_MINUTE=60
+RATE_LIMIT_BURST=10
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+# PostgreSQL
+DATABASE_URL="postgresql://cro_user:cro_password@localhost:5432/cro_ai_db"
+DATABASE_HOST="localhost"
+DATABASE_PORT=5432
+DATABASE_NAME="cro_ai_db"
+DATABASE_USER="cro_user"
+DATABASE_PASSWORD="cro_password"
+DATABASE_POOL_SIZE=10
+DATABASE_MAX_OVERFLOW=20
+DATABASE_POOL_TIMEOUT=30
+
+# Database SSL (for production)
+DATABASE_SSL_MODE="prefer"  # disable, allow, prefer, require
+
+# =============================================================================
+# REDIS CONFIGURATION
+# =============================================================================
+REDIS_URL="redis://localhost:6379/0"
+REDIS_HOST="localhost"
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=""
+REDIS_SSL=false
+REDIS_POOL_SIZE=10
+
+# Cache TTL (seconds)
+CACHE_TTL_SHORT=300      # 5 minutes
+CACHE_TTL_MEDIUM=1800    # 30 minutes
+CACHE_TTL_LONG=3600      # 1 hour
+
+# =============================================================================
+# AI MODELS & PROVIDERS
+# =============================================================================
+# OpenAI
+OPENAI_API_KEY="sk-your-openai-api-key-here"
+OPENAI_ORG_ID=""
+OPENAI_DEFAULT_MODEL="gpt-4-turbo-preview"
+OPENAI_EMBEDDING_MODEL="text-embedding-3-small"
+OPENAI_MAX_TOKENS=4000
+OPENAI_TEMPERATURE=0.7
+
+# Anthropic
+ANTHROPIC_API_KEY="sk-ant-your-anthropic-api-key-here"
+ANTHROPIC_DEFAULT_MODEL="claude-3-sonnet-20240229"
+ANTHROPIC_MAX_TOKENS=4000
+
+# Other AI Providers (as mentioned in requirements)
+MANUS_API_KEY="your-manus-api-key-here"
+GENSPARK_API_KEY="your-genspark-api-key-here"
+CONTEXT_IA_API_KEY="your-context-ia-api-key-here"
+SKYWORK_API_KEY="your-skywork-api-key-here"
+
+# AI Cost Management
+AI_BUDGET_DAILY_USD=100.00
+AI_BUDGET_MONTHLY_USD=3000.00
+AI_FALLBACK_MODEL="gpt-3.5-turbo"  # Cheaper fallback model
+
+# =============================================================================
+# VECTOR DATABASE & RAG
+# =============================================================================
+# Chroma DB
+CHROMA_HOST="localhost"
+CHROMA_PORT=8001
+CHROMA_COLLECTION_NAME="cro_knowledge"
+CHROMA_PERSIST_DIRECTORY="./data/chroma"
+
+# Embedding Configuration
+EMBEDDING_DIMENSION=1536
+EMBEDDING_BATCH_SIZE=100
+RAG_TOP_K=5
+RAG_SIMILARITY_THRESHOLD=0.7
+
+# =============================================================================
+# WHATSAPP BUSINESS API
+# =============================================================================
+# 360dialog (example provider)
+WHATSAPP_PROVIDER="360dialog"  # 360dialog, meta, infobip
+WHATSAPP_API_KEY="your-whatsapp-api-key-here"
+WHATSAPP_API_URL="https://waba.360dialog.io"
+WHATSAPP_PHONE_NUMBER_ID="your-phone-number-id"
+WHATSAPP_BUSINESS_ACCOUNT_ID="your-business-account-id"
+WHATSAPP_WEBHOOK_VERIFY_TOKEN="your-webhook-verify-token"
+WHATSAPP_WEBHOOK_SECRET="your-webhook-secret"
+
+# Twilio (alternative)
+TWILIO_ACCOUNT_SID="your-twilio-account-sid"
+TWILIO_AUTH_TOKEN="your-twilio-auth-token"
+TWILIO_WHATSAPP_NUMBER="+14155238886"
+
+# =============================================================================
+# GOOGLE APIS
+# =============================================================================
+# Google Cloud Project
+GOOGLE_CLOUD_PROJECT_ID="your-gcp-project-id"
+GOOGLE_APPLICATION_CREDENTIALS="./credentials/google-service-account.json"
+
+# Google Drive API
+GOOGLE_DRIVE_FOLDER_ID="your-drive-folder-id-for-uploads"
+
+# Google Calendar API
+GOOGLE_CALENDAR_ID="primary"
+
+# Google Sheets API
+GOOGLE_SHEETS_SPREADSHEET_ID="your-default-spreadsheet-id"
+
+# Gmail API
+GMAIL_USER_EMAIL="cro@maispetoficial.com.br"
+
+# Google Cloud Storage
+GCS_BUCKET_NAME="cro-ai-storage"
+GCS_BUCKET_REGION="us-central1"
+
+# =============================================================================
+# NOTION API
+# =============================================================================
+NOTION_API_KEY="secret_your-notion-integration-token"
+NOTION_DATABASE_ID="your-notion-database-id"
+NOTION_PAGE_ID="your-notion-page-id"
+
+# =============================================================================
+# CRM INTEGRATION
+# =============================================================================
+# HubSpot
+HUBSPOT_API_KEY="your-hubspot-api-key"
+HUBSPOT_PORTAL_ID="your-hubspot-portal-id"
+
+# Salesforce (alternative)
+SALESFORCE_CLIENT_ID="your-salesforce-client-id"
+SALESFORCE_CLIENT_SECRET="your-salesforce-client-secret"
+SALESFORCE_USERNAME="your-salesforce-username"
+SALESFORCE_PASSWORD="your-salesforce-password"
+SALESFORCE_SECURITY_TOKEN="your-salesforce-security-token"
+
+# =============================================================================
+# EMAIL CONFIGURATION
+# =============================================================================
+# SMTP Settings
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="cro@maispetoficial.com.br"
+SMTP_PASSWORD="your-app-password"
+SMTP_TLS=true
+SMTP_SSL=false
+
+# Email Templates
+EMAIL_FROM_NAME="CRO AI Agent"
+EMAIL_FROM_ADDRESS="cro@maispetoficial.com.br"
+EMAIL_REPLY_TO="noreply@maispetoficial.com.br"
+
+# =============================================================================
+# CELERY & BACKGROUND TASKS
+# =============================================================================
+CELERY_BROKER_URL="redis://localhost:6379/1"
+CELERY_RESULT_BACKEND="redis://localhost:6379/2"
+CELERY_TASK_SERIALIZER="json"
+CELERY_RESULT_SERIALIZER="json"
+CELERY_ACCEPT_CONTENT=["json"]
+CELERY_TIMEZONE="America/Sao_Paulo"
+CELERY_ENABLE_UTC=true
+
+# Task Timeouts (seconds)
+CELERY_TASK_SOFT_TIME_LIMIT=300
+CELERY_TASK_TIME_LIMIT=600
+
+# =============================================================================
+# OBSERVABILITY & MONITORING
+# =============================================================================
+# Prometheus
+PROMETHEUS_PORT=9090
+METRICS_ENABLED=true
+
+# OpenTelemetry
+OTEL_SERVICE_NAME="cro-ai-agent"
+OTEL_SERVICE_VERSION="1.0.0"
+OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4317"
+OTEL_RESOURCE_ATTRIBUTES="service.name=cro-ai-agent,service.version=1.0.0"
+
+# Logging
+LOG_FORMAT="json"  # json, text
+LOG_FILE_PATH="./logs/app.log"
+LOG_ROTATION="1 day"
+LOG_RETENTION="30 days"
+
+# Health Checks
+HEALTH_CHECK_INTERVAL=30
+HEALTH_CHECK_TIMEOUT=10
+
+# =============================================================================
+# BUSINESS CONFIGURATION (+Pet / Mais Pet)
+# =============================================================================
+COMPANY_NAME="+Pet / Mais Pet"
+COMPANY_DOMAIN="maispetoficial.com.br"
+COMPANY_TIMEZONE="America/Sao_Paulo"
+COMPANY_CURRENCY="BRL"
+COMPANY_LANGUAGE="pt-BR"
+
+# Business Hours (for automation scheduling)
+BUSINESS_HOURS_START="09:00"
+BUSINESS_HOURS_END="18:00"
+BUSINESS_DAYS="monday,tuesday,wednesday,thursday,friday"
+
+# =============================================================================
+# CAMPAIGN & MARKETING SETTINGS
+# =============================================================================
+# Default Campaign Settings
+DEFAULT_CPA_TARGET=50.00
+DEFAULT_BUDGET_DAILY=500.00
+DEFAULT_CAMPAIGN_DURATION_DAYS=30
+
+# WhatsApp Campaign Limits
+WHATSAPP_DAILY_MESSAGE_LIMIT=1000
+WHATSAPP_RATE_LIMIT_PER_SECOND=10
+
+# Email Campaign Limits
+EMAIL_DAILY_SEND_LIMIT=5000
+EMAIL_RATE_LIMIT_PER_MINUTE=100
+
+# =============================================================================
+# FILE STORAGE & UPLOADS
+# =============================================================================
+# Local Storage
+UPLOAD_DIR="./uploads"
+TEMP_DIR="./temp"
+MAX_FILE_SIZE_MB=50
+ALLOWED_FILE_TYPES="pdf,docx,xlsx,csv,jpg,jpeg,png,gif"
+
+# File Retention
+FILE_RETENTION_DAYS=90
+TEMP_FILE_CLEANUP_HOURS=24
+
+# =============================================================================
+# EXTERNAL SERVICES
+# =============================================================================
+# Social Media APIs
+TWITTER_API_KEY="your-twitter-api-key"
+TWITTER_API_SECRET="your-twitter-api-secret"
+TWITTER_ACCESS_TOKEN="your-twitter-access-token"
+TWITTER_ACCESS_TOKEN_SECRET="your-twitter-access-token-secret"
+
+# URL Shortener
+BITLY_ACCESS_TOKEN="your-bitly-access-token"
+
+# =============================================================================
+# DEVELOPMENT & TESTING
+# =============================================================================
+# Test Database
+TEST_DATABASE_URL="postgresql://test_user:test_password@localhost:5432/test_cro_ai_db"
+
+# Mock Services (for testing)
+MOCK_WHATSAPP_API=false
+MOCK_GOOGLE_APIS=false
+MOCK_AI_PROVIDERS=false
+
+# Debug Settings
+SQLALCHEMY_ECHO=false
+SHOW_SQL_QUERIES=false
+PROFILE_REQUESTS=false
+
+# =============================================================================
+# PRODUCTION SETTINGS
+# =============================================================================
+# SSL/TLS
+SSL_CERT_PATH=""
+SSL_KEY_PATH=""
+FORCE_HTTPS=false
+
+# Security Headers
+SECURITY_HEADERS_ENABLED=true
+HSTS_MAX_AGE=31536000
+
+# Performance
+GZIP_COMPRESSION=true
+STATIC_FILE_CACHE_MAX_AGE=86400
+
+# Backup Configuration
+BACKUP_ENABLED=true
+BACKUP_SCHEDULE="0 2 * * *"  # Daily at 2 AM
+BACKUP_RETENTION_DAYS=30
+BACKUP_S3_BUCKET="cro-ai-backups"
+
+# =============================================================================
+# FEATURE FLAGS
+# =============================================================================
+FEATURE_RAG_ENABLED=true
+FEATURE_WHATSAPP_ENABLED=true
+FEATURE_EMAIL_CAMPAIGNS_ENABLED=true
+FEATURE_GOOGLE_INTEGRATIONS_ENABLED=true
+FEATURE_NOTION_SYNC_ENABLED=true
+FEATURE_CRM_SYNC_ENABLED=true
+FEATURE_AI_COST_OPTIMIZATION_ENABLED=true
+FEATURE_ADVANCED_ANALYTICS_ENABLED=true
+
+# =============================================================================
+# LGPD COMPLIANCE
+# =============================================================================
+# Data Retention Policies
+USER_DATA_RETENTION_MONTHS=24
+CONVERSATION_DATA_RETENTION_MONTHS=12
+LOG_DATA_RETENTION_MONTHS=6
+ANALYTICS_DATA_RETENTION_MONTHS=36
+
+# Privacy Settings
+ANONYMIZE_USER_DATA=true
+ENCRYPT_SENSITIVE_DATA=true
+GDPR_COMPLIANCE_MODE=true
+
+# Data Processing Legal Bases
+DEFAULT_LEGAL_BASIS="legitimate_interest"  # consent, contract, legal_obligation, vital_interests, public_task, legitimate_interest
+
+# =============================================================================
+# AGENT CONFIGURATION
+# =============================================================================
+# Agent Behavior
+AGENT_MAX_ITERATIONS=10
+AGENT_TIMEOUT_SECONDS=300
+AGENT_MEMORY_WINDOW_SIZE=50
+
+# Agent Costs (USD per task)
+AGENT_COST_BUDGET_PER_TASK=5.00
+AGENT_COST_WARNING_THRESHOLD=3.00
+
+# Agent Capabilities
+AGENT_CAN_EXECUTE_ACTIONS=true
+AGENT_CAN_SEND_MESSAGES=true
+AGENT_CAN_CREATE_CALENDAR_EVENTS=true
+AGENT_CAN_MODIFY_SPREADSHEETS=true
+AGENT_REQUIRES_HUMAN_APPROVAL=false
+
+# =============================================================================
+# WEBHOOK ENDPOINTS
+# =============================================================================
+WEBHOOK_BASE_URL="https://your-domain.com/webhooks"
+WEBHOOK_SECRET="your-webhook-secret-for-validation"
+
+# Specific Webhook URLs
+WHATSAPP_WEBHOOK_URL="${WEBHOOK_BASE_URL}/whatsapp"
+GOOGLE_WEBHOOK_URL="${WEBHOOK_BASE_URL}/google"
+NOTION_WEBHOOK_URL="${WEBHOOK_BASE_URL}/notion"
+HUBSPOT_WEBHOOK_URL="${WEBHOOK_BASE_URL}/hubspot"
+
+# =============================================================================
+# TIMEZONE & LOCALIZATION
+# =============================================================================
+DEFAULT_TIMEZONE="America/Sao_Paulo"
+DEFAULT_LOCALE="pt_BR"
+DEFAULT_CURRENCY="BRL"
+DATE_FORMAT="%d/%m/%Y"
+TIME_FORMAT="%H:%M"
+DATETIME_FORMAT="%d/%m/%Y %H:%M"
+
+# =============================================================================
+# CUSTOM BUSINESS LOGIC
+# =============================================================================
+# Revenue Targets
+MONTHLY_REVENUE_TARGET=100000.00
+QUARTERLY_REVENUE_TARGET=300000.00
+ANNUAL_REVENUE_TARGET=1200000.00
+
+# KPI Thresholds
+CAC_WARNING_THRESHOLD=100.00
+CHURN_RATE_WARNING_THRESHOLD=0.05
+LTV_CAC_RATIO_TARGET=3.0
+
+# Automation Triggers
+AUTO_CAMPAIGN_OPTIMIZATION=true
+AUTO_BUDGET_ADJUSTMENT=true
+AUTO_AUDIENCE_EXPANSION=true
+AUTO_CREATIVE_TESTING=true
+
+# =============================================================================
+# END OF CONFIGURATION
+# =============================================================================

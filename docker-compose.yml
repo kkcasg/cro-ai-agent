@@ -1,0 +1,263 @@
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cro-ai-postgres
+    environment:
+      POSTGRES_DB: cro_ai_db
+      POSTGRES_USER: cro_ai_user
+      POSTGRES_PASSWORD: cro_ai_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cro-ai-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cro_ai_user -d cro_ai_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: cro-ai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cro-ai-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: cro-ai-backend
+    environment:
+      # Database
+      DATABASE_URL: postgresql://cro_ai_user:cro_ai_password@postgres:5432/cro_ai_db
+      REDIS_URL: redis://redis:6379/0
+      
+      # API Settings
+      API_V1_STR: /api/v1
+      SECRET_KEY: your-super-secret-key-change-in-production
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      ALGORITHM: HS256
+      
+      # AI Models
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      
+      # Integrations
+      WHATSAPP_API_TOKEN: ${WHATSAPP_API_TOKEN}
+      WHATSAPP_PHONE_NUMBER_ID: ${WHATSAPP_PHONE_NUMBER_ID}
+      GOOGLE_CREDENTIALS_PATH: /app/credentials/google-credentials.json
+      NOTION_API_TOKEN: ${NOTION_API_TOKEN}
+      
+      # Company Settings
+      COMPANY_NAME: "+Pet / Mais Pet"
+      COMPANY_DOMAIN: "maispetoficial.com.br"
+      
+      # Environment
+      ENVIRONMENT: development
+      DEBUG: "true"
+      LOG_LEVEL: INFO
+      
+      # LGPD & Security
+      DATA_RETENTION_MONTHS: 24
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./credentials:/app/credentials:ro
+      - backend_logs:/app/logs
+    networks:
+      - cro-ai-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: cro-ai-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+      NEXT_PUBLIC_WS_URL: ws://localhost:8000/ws
+      NEXT_PUBLIC_COMPANY_NAME: "+Pet / Mais Pet"
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: your-nextauth-secret-change-in-production
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - cro-ai-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Background Worker (Celery)
+  worker:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: cro-ai-worker
+    environment:
+      DATABASE_URL: postgresql://cro_ai_user:cro_ai_password@postgres:5432/cro_ai_db
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      WHATSAPP_API_TOKEN: ${WHATSAPP_API_TOKEN}
+      GOOGLE_CREDENTIALS_PATH: /app/credentials/google-credentials.json
+      NOTION_API_TOKEN: ${NOTION_API_TOKEN}
+      ENVIRONMENT: development
+      LOG_LEVEL: INFO
+    volumes:
+      - ./backend:/app
+      - ./credentials:/app/credentials:ro
+      - worker_logs:/app/logs
+    networks:
+      - cro-ai-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.core.celery worker --loglevel=info --concurrency=4
+    restart: unless-stopped
+
+  # Celery Beat Scheduler
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: cro-ai-scheduler
+    environment:
+      DATABASE_URL: postgresql://cro_ai_user:cro_ai_password@postgres:5432/cro_ai_db
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: development
+      LOG_LEVEL: INFO
+    volumes:
+      - ./backend:/app
+      - scheduler_logs:/app/logs
+    networks:
+      - cro-ai-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.core.celery beat --loglevel=info
+    restart: unless-stopped
+
+  # Vector Database (Chroma)
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: cro-ai-chroma
+    environment:
+      CHROMA_SERVER_HOST: 0.0.0.0
+      CHROMA_SERVER_HTTP_PORT: 8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - cro-ai-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Monitoring - Prometheus (opcional para produção)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cro-ai-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - cro-ai-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    profiles:
+      - monitoring
+
+  # Grafana Dashboard (opcional para produção)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cro-ai-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - cro-ai-network
+    profiles:
+      - monitoring
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  chroma_data:
+    driver: local
+  backend_logs:
+    driver: local
+  worker_logs:
+    driver: local
+  scheduler_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  cro-ai-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
